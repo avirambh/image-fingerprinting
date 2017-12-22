@@ -6,6 +6,7 @@ from PIL import Image
 import imagehash
 import argparse
 import shelve
+import sys
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -25,13 +26,22 @@ db = shelve.open(args["shelve"])
 # value
 query = Image.open(args["query"])
 h = str(imagehash.dhash(query))
-filenames = db[h]
-print "Found %d images" % (len(filenames))
+if h in db:
+  filenames = db[h]
+else:
+  filenames = []
+
+print "Found %d images:" % (len(filenames))
+print filenames
 
 # loop over the images
-for filename in filenames:
-	image = Image.open(args["dataset"] + "/" + filename)
-	image.show()
+#for filename in filenames:
+#	image = Image.open(args["dataset"] + "/" + filename)
+#	image.show()
 
 # close the shelve database
 db.close()
+if len(filenames) == 0:
+  sys.exit(0)
+else:
+  sys.exit(1)
